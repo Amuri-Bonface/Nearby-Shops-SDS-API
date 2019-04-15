@@ -123,17 +123,17 @@ public class ServiceConfigurationLocal {
     private Integer serviceType;
     private Integer serviceLevel;
 
-    private Double latCenter;
-    private Double lonCenter;
+    private double latCenter;
+    private double lonCenter;
 
-    private Integer serviceRange;
+    private int serviceRange;
 //    private Integer shopDeliveryRangeMax;
 
     private Timestamp created;
     private Timestamp updated;
 
     // real time variables : the values of these variables are generated in real time.
-    private Double rt_distance;
+    private double rt_distance;
 
 
     public String getDescriptionShort() {

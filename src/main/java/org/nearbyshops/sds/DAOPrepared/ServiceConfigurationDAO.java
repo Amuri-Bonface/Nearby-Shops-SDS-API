@@ -2,6 +2,7 @@ package org.nearbyshops.sds.DAOPrepared;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zaxxer.hikari.HikariDataSource;
+import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Model.Endpoints.ServiceConfigurationEndPoint;
 import org.nearbyshops.sds.Model.ServiceConfigurationGlobal;
@@ -17,7 +18,7 @@ public class ServiceConfigurationDAO {
     private HikariDataSource dataSource = Globals.getDataSource();
 
 
-    public int insertShop(ServiceConfigurationGlobal serviceConfigurationGlobal)
+    public int insertServiceConfig(ServiceConfigurationGlobal serviceConfigurationGlobal)
     {
 
         Connection connection = null;
@@ -147,7 +148,7 @@ public class ServiceConfigurationDAO {
     }
 
 
-    public int updateShop(ServiceConfigurationGlobal serviceConfigurationGlobal)
+    public int updateServiceConfig(ServiceConfigurationGlobal serviceConfigurationGlobal)
     {
 
 
@@ -229,6 +230,9 @@ public class ServiceConfigurationDAO {
             statement.setObject(++i,serviceConfigurationGlobal.getLatCenter());
             statement.setObject(++i,serviceConfigurationGlobal.getLonCenter());
 
+
+
+
             statement.setObject(++i,serviceConfigurationGlobal.getServiceRange());
 
 //            statement.setObject(++i,serviceConfigurationGlobal.getOfficial());
@@ -274,8 +278,6 @@ public class ServiceConfigurationDAO {
 
         return updatedRows;
     }
-
-
 
 
 
@@ -402,6 +404,10 @@ public class ServiceConfigurationDAO {
 
 
 
+
+
+
+
     public ServiceConfigurationEndPoint getListQuerySimple(
             Double latCenter, Double lonCenter,
             Double proximity,
@@ -417,7 +423,7 @@ public class ServiceConfigurationDAO {
         String queryJoin = "";
 
         // flag for tracking whether to put "AND" or "WHERE"
-        boolean isFirst = true;
+//        boolean isFirst = true;
 
 
         String queryNormal = "SELECT "
@@ -463,29 +469,34 @@ public class ServiceConfigurationDAO {
                 + ServiceConfigurationGlobal.CREATED + ","
                 + ServiceConfigurationGlobal.UPDATED + ""
 
-                + " FROM " + ServiceConfigurationGlobal.TABLE_NAME;
+                + " FROM " + ServiceConfigurationGlobal.TABLE_NAME
+                + " WHERE TRUE ";
 
 
 
-//        // Visibility Filter : Apply
-//        if(latCenter != null && lonCenter != null)
-//        {
-//
-//            String queryPartlatLonCenter = "";
-//
-//            queryNormal = queryNormal + " WHERE ";
-//
-//            // reset the flag
+
+        // Visibility Filter : Apply
+        if(latCenter != null && lonCenter != null)
+        {
+
+            String queryPartlatLonCenter = "";
+
+//            queryNormal = queryNormal + " AND ";
+            // reset the flag
 //            isFirst = false;
-//
-//            queryPartlatLonCenter = queryPartlatLonCenter
-//                    + "6371 * acos( cos( radians("
-//                    + latCenter + ")) * cos( radians( " + ServiceConfigurationGlobal.LAT_CENTER + ") ) * cos(radians( " + ServiceConfigurationGlobal.LON_CENTER + " ) - radians("
-//                    + lonCenter + "))" + " + sin( radians(" + latCenter + ")) * sin(radians( " + ServiceConfigurationGlobal.LAT_CENTER + " ))) <= " + ServiceConfigurationGlobal.SERVICE_RANGE;
-//
-//            queryNormal = queryNormal + queryPartlatLonCenter;
-//
-//        }
+
+            queryPartlatLonCenter = queryPartlatLonCenter
+                    + "6371 * acos( cos( radians("
+                    + latCenter + ")) * cos( radians( " + ServiceConfigurationGlobal.LAT_CENTER + ") ) * cos(radians( " + ServiceConfigurationGlobal.LON_CENTER + " ) - radians("
+                    + lonCenter + "))" + " + sin( radians(" + latCenter + ")) * sin(radians( " + ServiceConfigurationGlobal.LAT_CENTER + " ))) <= " + ServiceConfigurationGlobal.SERVICE_RANGE;
+
+
+            queryNormal = queryNormal + " AND " + queryPartlatLonCenter;
+
+        }
+
+
+
 
 
 
@@ -526,17 +537,19 @@ public class ServiceConfigurationDAO {
 
             queryPartOfficial = queryPartOfficial + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.IS_OFFICIAL_SERVICE_PROVIDER + " = " + isOfficial;
 
-            if(isFirst)
-            {
-                queryNormal = queryNormal + " WHERE " + queryPartOfficial;
+//            if(isFirst)
+//            {
+//                queryNormal = queryNormal + " WHERE " + queryPartOfficial;
+//
+//                // reset the flag
+//                isFirst = false;
+//
+//            }else
+//            {
+//                queryNormal = queryNormal + " AND " + queryPartOfficial;
+//            }
 
-                // reset the flag
-                isFirst = false;
-
-            }else
-            {
-                queryNormal = queryNormal + " AND " + queryPartOfficial;
-            }
+            queryNormal = queryNormal + " AND " + queryPartOfficial;
         }
 
 
@@ -547,17 +560,19 @@ public class ServiceConfigurationDAO {
 
             queryPartVerified = queryPartVerified + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.IS_VERIFIED + " = " + isVerified;
 
-            if(isFirst)
-            {
-                queryNormal = queryNormal + " WHERE " + queryPartVerified;
+//            if(isFirst)
+//            {
+//                queryNormal = queryNormal + " WHERE " + queryPartVerified;
+//
+//                // reset the flag
+//                isFirst = false;
+//
+//            }else
+//            {
+//                queryNormal = queryNormal + " AND " + queryPartVerified;
+//            }
 
-                // reset the flag
-                isFirst = false;
-
-            }else
-            {
-                queryNormal = queryNormal + " AND " + queryPartVerified;
-            }
+            queryNormal = queryNormal + " AND " + queryPartVerified;
         }
 
 
@@ -568,17 +583,20 @@ public class ServiceConfigurationDAO {
 
             queryPartServiceType = queryPartServiceType + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.SERVICE_TYPE + " = " + serviceType;
 
-            if(isFirst)
-            {
-                queryNormal = queryNormal + " WHERE " + queryPartServiceType;
+//            if(isFirst)
+//            {
+//                queryNormal = queryNormal + " WHERE " + queryPartServiceType;
+//
+//                // reset the flag
+//                isFirst = false;
+//
+//            }else
+//            {
+//                queryNormal = queryNormal + " AND " + queryPartServiceType;
+//            }
 
-                // reset the flag
-                isFirst = false;
 
-            }else
-            {
-                queryNormal = queryNormal + " AND " + queryPartServiceType;
-            }
+            queryNormal = queryNormal + " AND " + queryPartServiceType;
         }
 
 
@@ -591,18 +609,21 @@ public class ServiceConfigurationDAO {
 
 
 
-            if(isFirst)
-            {
-//				queryJoin = queryJoin + " WHERE " + queryPartSearch;
+//            if(isFirst)
+//            {
+////				queryJoin = queryJoin + " WHERE " + queryPartSearch;
+//
+//                queryNormal = queryNormal + " WHERE " + queryPartSearch;
+//
+//                isFirst = false;
+//            }
+//            else
+//            {
+//                queryNormal = queryNormal + " AND " + queryPartSearch;
+//            }
 
-                queryNormal = queryNormal + " WHERE " + queryPartSearch;
 
-                isFirst = false;
-            }
-            else
-            {
-                queryNormal = queryNormal + " AND " + queryPartSearch;
-            }
+            queryNormal = queryNormal + " AND " + queryPartSearch;
         }
 
 
@@ -613,16 +634,20 @@ public class ServiceConfigurationDAO {
             String serviceURLquery = "(" + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.SERVICE_URL + " = " + serviceURL + " )";
 
 
-            if(isFirst)
-            {
-                queryNormal = queryNormal + " WHERE " + serviceURLquery;
 
-                isFirst = false;
-            }
-            else
-            {
-                queryNormal = queryNormal + " AND " + serviceURLquery;
-            }
+//            if(isFirst)
+//            {
+//                queryNormal = queryNormal + " WHERE " + serviceURLquery;
+//
+//                isFirst = false;
+//            }
+//            else
+//            {
+//                queryNormal = queryNormal + " AND " + serviceURLquery;
+//            }
+
+
+            queryNormal = queryNormal + " AND " + serviceURLquery;
         }
 
 
@@ -744,7 +769,7 @@ public class ServiceConfigurationDAO {
                 shopList.add(sc);
             }
 
-            System.out.println("Total Shops queried " + shopList.size());
+//            System.out.println("Total Items Fetched " + shopList.size());
 
 
             endPoint.setResults(shopList);

@@ -1,18 +1,16 @@
 package org.nearbyshops.sds;
 
-import org.eclipse.jetty.server.Server;
-//import org.glassfish.grizzly.http.server.HttpServer;
-//import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.nearbyshops.sds.Globals.GlobalConfig;
+import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Model.ServiceConfigurationGlobal;
-import org.nearbyshops.sds.ModelRoles.Admin;
-import org.nearbyshops.sds.ModelRoles.Staff;
-import org.nearbyshops.sds.ModelRoles.Usernames;
+import org.nearbyshops.sds.ModelRoles.EmailVerificationCode;
+import org.nearbyshops.sds.ModelRoles.PhoneVerificationCode;
+import org.nearbyshops.sds.ModelRoles.StaffPermissions;
+import org.nearbyshops.sds.ModelRoles.User;
 
-import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -23,118 +21,55 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Main class.
+ * Main__ class.
  *
  */
 
 
 
+
+
+
 public class Main {
+
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://0.0.0.0:5125/api/";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
      * @return Grizzly HTTP server.
      */
-    public static Server startServer() {
+
+
+
+
+    public static void startJettyServer() {
         // create a resource config that scans for JAX-RS resources and providers
-        // in org.nearbyshops.sds package
+        // in org.taxireferral.api package
         final ResourceConfig rc = new ResourceConfig().packages("org.nearbyshops.sds");
 
-        // create and start a new instance of grizzly http server
-        // exposing the Jersey application at BASE_URI
-//        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
 
-
-//        URI baseUri = UriBuilder.fromUri("http://localhost/").port(8888).build();
-//        ResourceConfig config = new ResourceConfig(TestResource.class);
-//        Server server = JettyHttpContainerFactory.createServer(baseUri, config);
-
-        SslContextFactory factory = new SslContextFactory();
-
-
-        return JettyHttpContainerFactory.createServer(URI.create(BASE_URI),rc);
+        System.out.println("Base URL : " + GlobalConstants.BASE_URI);
+        JettyHttpContainerFactory.createServer(URI.create(GlobalConstants.BASE_URI),rc);
     }
 
-    /**
-     * Main method.
-     * @param args
-     * @throws IOException
-     */
-    public final static void main(String[] args) throws IOException {
 
 
-        createDB();
+
+    public static void main(String[] args) throws IOException {
+
+
+        GlobalConfig.loadGlobalConfiguration();
+
+//        createDB();
+        upgradeTables();
+
         createTables();
-
-//        final HttpServer server = startServer();
-
-        startServer();
-
-//        System.out.println(String.format("Jersey app started with WADL available at "
-//                + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
-
-//        System.in.read();
-//        server.stop();
-    }
-
-
-
-    private static void createDB()
-    {
-
-        Connection conn = null;
-        Statement stmt = null;
-
-        try {
-
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres"
-                    ,JDBCContract.CURRENT_USERNAME
-                    ,JDBCContract.CURRENT_PASSWORD);
-
-            stmt = conn.createStatement();
-
-            String createDB = "CREATE DATABASE \"SDS_DB\" WITH ENCODING='UTF8' OWNER=postgres CONNECTION LIMIT=-1";
-
-            stmt.executeUpdate(createDB);
-
-        }
-        catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        finally{
-
-
-            // close the connection and statement accountApproved
-
-            if(stmt !=null)
-            {
-
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-            }
-
-
-            if(conn!=null)
-            {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
+        startJettyServer();
 
     }
+
+
+
 
 
 
@@ -145,99 +80,100 @@ public class Main {
         Connection connection = null;
         Statement statement = null;
 
+
+
         try {
 
-            connection = DriverManager.getConnection(JDBCContract.CURRENT_CONNECTION_URL
-                    ,JDBCContract.CURRENT_USERNAME
-                    ,JDBCContract.CURRENT_PASSWORD);
+            connection = DriverManager.getConnection(GlobalConstants.POSTGRES_CONNECTION_URL,
+                    GlobalConstants.POSTGRES_USERNAME, GlobalConstants.POSTGRES_PASSWORD);
+
 
             statement = connection.createStatement();
 
-
-//            statement.executeUpdate(ItemCategory.createTableItemCategoryPostgres);
-//            statement.executeUpdate(Item.createTableItemPostgres);
-
-            // Create Table Admin
-            statement.executeUpdate(Usernames.createTableUsernamesPostgres);
-            statement.executeUpdate(Admin.createTableAdminPostgres);
-            statement.executeUpdate(Staff.createTableStaffPostgres);
+            statement.executeUpdate(User.createTable);
+            statement.executeUpdate(StaffPermissions.createTablePostgres);
+            statement.executeUpdate(EmailVerificationCode.createTablePostgres);
+            statement.executeUpdate(PhoneVerificationCode.createTablePostgres);
 
 
             // create table service configuration
             statement.executeUpdate(ServiceConfigurationGlobal.createTableServiceConfigurationPostgres);
+
+
+
 
             System.out.println("Tables Created ... !");
 
 
 
 
-            // developers Note: whenever adding a table please check that its dependencies are already created.
+
+            // developers Note: whenever adding a table please check that tables it depends on are created first
+
+
+            // Create admin account with given username and password if it does not exit | or update in case admin account exist
+
+            User admin = new User();
+            admin.setUsername(GlobalConstants.ADMIN_USERNAME);
+            admin.setRole(1);
+            admin.setPassword(GlobalConstants.ADMIN_PASSWORD);
+
+
+            System.out.println("Admin Username : " + GlobalConstants.ADMIN_USERNAME + " | " + " Admin Password : " + GlobalConstants.ADMIN_PASSWORD);
 
 
 
-            // Insert the default administrator if it does not exit
+            boolean adminRoleExist = Globals.daoUserSignUp.checkRoleExists(GlobalConstants.ROLE_ADMIN_CODE);
 
-            if(Globals.adminDAOPrepared.getAdmin(null,null).size()<=0)
+            if(adminRoleExist)
             {
-                Admin defaultAdmin = new Admin();
-
-                defaultAdmin.setPassword("password");
-                defaultAdmin.setUsername("username");
-                defaultAdmin.setAdministratorName("default name");
-
-                Globals.adminDAOPrepared.saveDefaultAdmin(defaultAdmin);
+                Globals.daoUserSignUp.updateAdminUsername(admin);
+            }
+            else
+            {
+                Globals.daoUserSignUp.createAdmin(admin,true);
             }
 
 
 
 
-
-//            // Insert the default administrator if it does not exit
 //
-//            if(Globals.adminDAOPrepared.getAdmin(1)==null)
+//            // Insert the root category whose ID is 1
+//
+//            String insertItemCategory = "";
+//
+//            // The root ItemCategory has id 1. If the root category does not exist then insert it.
+//            if(Globals.itemCategoryDAO.checkRoot(1) == null)
 //            {
-//                Admin defaultAdminInheritance = new Admin();
 //
-//                defaultAdminInheritance.setPassword("password");
-//                defaultAdminInheritance.setUsername("username");
-//                defaultAdminInheritance.setAdministratorName("default name");
+//                insertItemCategory = "INSERT INTO "
+//                        + ItemCategory.TABLE_NAME
+//                        + "("
+//                        + ItemCategory.ITEM_CATEGORY_ID + ","
+//                        + ItemCategory.ITEM_CATEGORY_NAME + ","
+//                        + ItemCategory.PARENT_CATEGORY_ID + ","
+//                        + ItemCategory.ITEM_CATEGORY_DESCRIPTION + ","
+//                        + ItemCategory.IMAGE_PATH + ","
+//                        + ItemCategory.IS_LEAF_NODE + ") VALUES("
+//                        + "" + "1"	+ ","
+//                        + "'" + "ROOT"	+ "',"
+//                        + "" + "NULL" + ","
+//                        + "'" + "This is the root Category. Do not modify it." + "',"
+//                        + "'" + " " + "',"
+//                        + "'" + "FALSE" + "'"
+//                        + ")";
 //
-//                Globals.adminDAOPrepared.saveDefaultAdmin(defaultAdminInheritance);
-//            }
 //
-
-
-
-
-
-
-            // Insert Default Settings
-//            SettingsDAOPrepared settingsDAO = Globals.settingsDAOPrepared;
-
-//            if(settingsDAO.getServiceConfiguration()==null){
-//                settingsDAO.saveSettings(settingsDAO.getDefaultConfiguration());
+//
+//                statement.executeUpdate(insertItemCategory);
+//
 //            }
 
 
 
 
-            // Insert Default Service Configuration
 
-//            String insertServiceConfig = "";
 
-//            if(Globals.serviceConfigurationDAO.getServiceConfiguration()==null)
-//            {
-
-//                ServiceConfigurationLocal defaultConfiguration = new ServiceConfigurationLocal();
-
-//                defaultConfiguration.setServiceLevel(GlobalConstants.SERVICE_LEVEL_CITY);
-//                defaultConfiguration.setServiceType(GlobalConstants.SERVICE_TYPE_NONPROFIT);
-//                defaultConfiguration.setServiceID(1);
-//                defaultConfiguration.setServiceName("DEFAULT_CONFIGURATION");
-
-//                Globals.serviceConfigurationDAO.saveService(defaultConfiguration);
-
-//            }
 
 
             // create directory images
@@ -303,6 +239,86 @@ public class Main {
             }
         }
     }
+
+
+
+
+    private static void upgradeTables()
+    {
+
+        Connection connection = null;
+        Statement statement = null;
+
+
+//        Configuration configuration = GlobalConfig.getConfiguration();
+//
+//
+//        if(configuration==null)
+//        {
+//            System.out.println("Configuration is null : Upgrade Tables !");
+//
+//            return;
+//        }
+//
+//
+//        String connection_url = configuration.getString(ConfigurationKeys.CONNECTION_URL);
+//        String username = configuration.getString(ConfigurationKeys.POSTGRES_USERNAME);
+//        String password = configuration.getString(ConfigurationKeys.POSTGRES_PASSWORD);
+
+
+        try {
+
+//            connection = DriverManager.getConnection(connection_url, username,password);
+
+            connection = DriverManager.getConnection(GlobalConstants.POSTGRES_CONNECTION_URL,
+                    GlobalConstants.POSTGRES_USERNAME, GlobalConstants.POSTGRES_PASSWORD);
+
+
+            statement = connection.createStatement();
+
+
+
+            System.out.println("Tables Upgrade Complete ... !");
+
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        finally{
+
+
+            // close the connection and statement accountApproved
+
+            if(statement !=null)
+            {
+
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            }
+
+
+            if(connection!=null)
+            {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+
+
 
 }
 

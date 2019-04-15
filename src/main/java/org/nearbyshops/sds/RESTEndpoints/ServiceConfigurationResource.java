@@ -5,8 +5,6 @@ import net.coobird.thumbnailator.Thumbnails;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.nearbyshops.sds.DAOPrepared.ServiceConfigurationDAO;
-import org.nearbyshops.sds.Globals.APIErrors;
-import org.nearbyshops.sds.Globals.ErrorNBSAPI;
 import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Model.Endpoints.ServiceConfigurationEndPoint;
@@ -31,11 +29,15 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 
+
+
+
+
 @Path("/api/v1/ServiceConfiguration")
 @Produces(MediaType.APPLICATION_JSON)
 public class ServiceConfigurationResource {
 
-	private ServiceConfigurationDAO shopDAO = Globals.serviceConfigurationDAO;
+	private ServiceConfigurationDAO serviceConfigDAO = Globals.serviceConfigurationDAO;
 
 
 
@@ -63,7 +65,7 @@ public class ServiceConfigurationResource {
 
 
 		ServiceConfigurationEndPoint endPoint =
-				shopDAO.getListQuerySimple(null,null,null,"'" + serviceURL + "'",
+				serviceConfigDAO.getListQuerySimple(null,null,null,"'" + serviceURL + "'",
 						null,null,
 						null,null,null,null,null);
 
@@ -82,10 +84,19 @@ public class ServiceConfigurationResource {
 		}
 
 
+
+		if(serviceConfigurationLocal.getServiceRange()> GlobalConstants.max_service_range)
+		{
+			// this is the ensure service range does not exceed a fixed limit
+			serviceConfigurationLocal.setServiceRange(GlobalConstants.max_service_range);
+		}
+
+
+
 		if(endPoint.getItemCount()==1)
 		{
 			// already exist: Make an Update Call
-//			shopDAO.updateServiceByStaff(endPoint.getResults().get(0));
+//			serviceConfigDAO.updateServiceByStaff(endPoint.getResults().get(0));
 
 			if(serviceConfigurationLocal !=null) {
 
@@ -100,7 +111,7 @@ public class ServiceConfigurationResource {
 					newImageIDUploaded = saveNewImage(serviceURL, newImageID);
 					serviceConfigurationLocal.setLogoImagePath(newImageIDUploaded);
 
-					rowCountUpdated = shopDAO.updateShop(Globals.localToGlobal(serviceConfigurationLocal, serviceURL));
+					rowCountUpdated = serviceConfigDAO.updateServiceConfig(Globals.localToGlobal(serviceConfigurationLocal, serviceURL));
 					isUpdated = true;
 
 
@@ -127,7 +138,7 @@ public class ServiceConfigurationResource {
 //				else
 //				{
 						// image has not changed
-//					rowCountUpdated = shopDAO.updateServiceByStaff(Globals.localToGlobal(serviceConfigurationLocal,serviceURL));
+//					rowCountUpdated = serviceConfigDAO.updateServiceByStaff(Globals.localToGlobal(serviceConfigurationLocal,serviceURL));
 //					isUpdated = true;
 //				}
 
@@ -145,7 +156,7 @@ public class ServiceConfigurationResource {
 
 				newImageIDUploaded = saveNewImage(serviceURL, newImageID);
 				serviceConfigurationLocal.setLogoImagePath(newImageIDUploaded);
-				idOfInsertedRow = shopDAO.insertShop(Globals.localToGlobal(serviceConfigurationLocal,serviceURL));
+				idOfInsertedRow = serviceConfigDAO.insertServiceConfig(Globals.localToGlobal(serviceConfigurationLocal,serviceURL));
 			}
 		}
 
@@ -245,7 +256,7 @@ public class ServiceConfigurationResource {
 
 		serviceConfigurationGlobal.setServiceID(serviceID);
 
-		int rowCount = shopDAO.updateForStaff(serviceConfigurationGlobal);
+		int rowCount = serviceConfigDAO.updateForStaff(serviceConfigurationGlobal);
 
 		if(rowCount >= 1)
 		{
@@ -286,7 +297,7 @@ public class ServiceConfigurationResource {
 
 
 
-		int rowCount = shopDAO.deleteService(serviceID);
+		int rowCount = serviceConfigDAO.deleteService(serviceID);
 
 
 		if(rowCount>=1)
@@ -345,7 +356,7 @@ public class ServiceConfigurationResource {
 
 
 
-		ServiceConfigurationEndPoint endPoint = shopDAO.getListQuerySimple(
+		ServiceConfigurationEndPoint endPoint = serviceConfigDAO.getListQuerySimple(
 									latCenter,lonCenter,
 									proximity,
 									serviceURL,searchString,
