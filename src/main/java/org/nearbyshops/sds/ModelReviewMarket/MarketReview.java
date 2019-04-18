@@ -29,7 +29,7 @@ public class MarketReview {
 
 
     // create Table statement
-    public static final String createTableItemReviewPostgres =
+    public static final String createTablePostgres =
 
             "CREATE TABLE IF NOT EXISTS " + MarketReview.TABLE_NAME + "("
 

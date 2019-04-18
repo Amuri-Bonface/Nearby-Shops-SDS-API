@@ -8,8 +8,9 @@ import org.nearbyshops.sds.ModelRoles.User;
 
 public class MarketReviewThanks {
 
+
     // Table Name
-    public static final String TABLE_NAME = "ITEM_REVIEW_THANKS";
+    public static final String TABLE_NAME = "MARKET_REVIEW_THANKS";
 
     // column Names
     public static final String END_USER_ID = "END_USER_ID"; // foreign Key
@@ -18,7 +19,7 @@ public class MarketReviewThanks {
 
 
     // Create Table Statement
-    public static final String createTableItemReviewThanksPostgres = "CREATE TABLE IF NOT EXISTS "
+    public static final String createTable = "CREATE TABLE IF NOT EXISTS "
             + MarketReviewThanks.TABLE_NAME + "("
 
             + " " + MarketReviewThanks.END_USER_ID + " INT,"

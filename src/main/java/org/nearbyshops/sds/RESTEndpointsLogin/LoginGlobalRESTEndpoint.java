@@ -49,10 +49,6 @@ public class LoginGlobalRESTEndpoint {
 
 
 
-
-
-
-
         final String encodedUserPassword = headerParam.replaceFirst(AUTHENTICATION_SCHEME + " ", "");
 
         //Decode username and password
@@ -77,10 +73,16 @@ public class LoginGlobalRESTEndpoint {
 
 
 
-        User user = daoUser.verifyUserWithPhone(username,password);
+
+
+        User user = daoUser.verifyUser(username,password);
 
 //        Gson gson = new Gson();
 //        System.out.println(gson.toJson(user));
+
+
+
+
 
 
         if(user == null)
@@ -94,7 +96,10 @@ public class LoginGlobalRESTEndpoint {
 
             if(getUserProfile)
             {
+                User userProfile = daoUser.getProfile(username,password);
+
                 return Response.status(Response.Status.OK)
+                        .entity(userProfile)
                         .build();
             }
             else

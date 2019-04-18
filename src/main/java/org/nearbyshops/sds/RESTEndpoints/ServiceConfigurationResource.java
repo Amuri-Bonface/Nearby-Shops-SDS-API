@@ -5,6 +5,7 @@ import net.coobird.thumbnailator.Thumbnails;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.nearbyshops.sds.DAOPrepared.ServiceConfigurationDAO;
+import org.nearbyshops.sds.DAORoles.DAOUserNew;
 import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Model.Endpoints.ServiceConfigurationEndPoint;
@@ -27,10 +28,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
-
-
-
+import java.util.Base64;
+import java.util.List;
+import java.util.StringTokenizer;
 
 
 @Path("/api/v1/ServiceConfiguration")
@@ -38,6 +38,7 @@ import java.nio.file.StandardCopyOption;
 public class ServiceConfigurationResource {
 
 	private ServiceConfigurationDAO serviceConfigDAO = Globals.serviceConfigurationDAO;
+	private DAOUserNew daoUser = Globals.daoUserNew;
 
 
 
@@ -64,10 +65,18 @@ public class ServiceConfigurationResource {
 
 
 
+//		ServiceConfigurationEndPoint endPoint =
+//				serviceConfigDAO.getListQuerySimple(null,null,null,"'" + serviceURL + "'",
+//						null,null,
+//						null,null,null,null,null);
+
+
 		ServiceConfigurationEndPoint endPoint =
-				serviceConfigDAO.getListQuerySimple(null,null,null,"'" + serviceURL + "'",
-						null,null,
-						null,null,null,null,null);
+				serviceConfigDAO.getListQuerySimple(null,null,"'" + serviceURL + "'",
+						null,false,0,null,null,null);
+
+
+
 
 		String oldImageID = "";
 		String newImageID = "";
@@ -326,9 +335,14 @@ public class ServiceConfigurationResource {
 
 
 
+	private static final String AUTHENTICATION_SCHEME = "Basic";
+
+
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServicesListSimple(
+			@HeaderParam("Authorization")String headerParam,
 			@QueryParam("latCenter")Double latCenter, @QueryParam("lonCenter")Double lonCenter,
 			@QueryParam("proximity")Double proximity,
 			@QueryParam("ServiceURL") String serviceURL,
@@ -339,6 +353,23 @@ public class ServiceConfigurationResource {
 			@QueryParam("Limit") Integer limit, @QueryParam("Offset") int offset
 	)
 	{
+
+		final String encodedUserPassword = headerParam.replaceFirst(AUTHENTICATION_SCHEME + " ", "");
+
+		//Decode username and password
+		String usernameAndPassword = new String(Base64.getDecoder().decode(encodedUserPassword.getBytes()));
+
+		//Split username and password tokens
+		final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
+		final String username = tokenizer.nextToken();
+		final String password = tokenizer.nextToken();
+
+
+		User user = daoUser.verifyUser(username,password);
+
+
+
+
 
 		final int max_limit = 100;
 
@@ -356,18 +387,41 @@ public class ServiceConfigurationResource {
 
 
 
+
 		ServiceConfigurationEndPoint endPoint = serviceConfigDAO.getListQuerySimple(
 									latCenter,lonCenter,
-									proximity,
 									serviceURL,searchString,
-									isOfficial,isVerified,
-									serviceType,
+									false,0,
 									sortBy,limit,offset);
 
 
 		endPoint.setLimit(limit);
 		endPoint.setMax_limit(max_limit);
 		endPoint.setOffset(offset);
+
+
+
+		if(user!=null)
+		{
+			// get saved markets
+
+			List<ServiceConfigurationGlobal> savedMarkets = serviceConfigDAO.getListQuerySimple(
+																	latCenter,lonCenter,
+																	serviceURL,searchString,
+																	true,user.getUserID(),
+																	sortBy,limit,offset)
+					.getResults();
+
+
+			if(savedMarkets.size()>0)
+			{
+				endPoint.setSavedMarkets(savedMarkets);
+			}
+
+
+			System.out.println("Saved Markets List Size : " + savedMarkets.size());
+
+		}
 
 
 		/*try {

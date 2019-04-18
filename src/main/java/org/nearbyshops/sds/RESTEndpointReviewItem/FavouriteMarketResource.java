@@ -1,13 +1,18 @@
 package org.nearbyshops.sds.RESTEndpointReviewItem;
 
-import org.nearbyshops.sds.DAOPreparedReviewItem.MarketReviewThanksDAO;
-import org.nearbyshops.sds.Globals.Globals;
-import org.nearbyshops.sds.ModelReviewEndpoint.ItemReviewThanksEndpoint;
-import org.nearbyshops.sds.ModelReviewMarket.MarketReviewThanks;
 
+import org.nearbyshops.sds.DAOPreparedReviewItem.FavoriteMarketDAO;
+import org.nearbyshops.sds.Globals.GlobalConstants;
+import org.nearbyshops.sds.Globals.Globals;
+import org.nearbyshops.sds.ModelReviewEndpoint.FavouriteItemEndpoint;
+import org.nearbyshops.sds.ModelReviewMarket.FavouriteMarket;
+import org.nearbyshops.sds.ModelRoles.User;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -15,34 +20,43 @@ import java.util.List;
  */
 
 
-@Path("/api/v1/ItemReviewThanks")
-public class ItemReviewThanksResource {
 
 
-    private MarketReviewThanksDAO thanksDAOPrepared = Globals.marketReviewThanksDAO;
 
+@Path("/api/v1/FavouriteMarket")
+public class FavouriteMarketResource {
+
+
+    private FavoriteMarketDAO favoriteItemDAOPrepared = Globals.favoriteMarketDAO;
 
 
         @POST
         @Produces(MediaType.APPLICATION_JSON)
         @Consumes(MediaType.APPLICATION_JSON)
-        public Response saveItemReviewThanks(MarketReviewThanks itemReviewThanks)
+        @RolesAllowed({GlobalConstants.ROLE_END_USER})
+        public Response saveFavouriteBook(FavouriteMarket item)
         {
-            int idOfInsertedRow = thanksDAOPrepared.saveItemReviewThanks(itemReviewThanks);
 
-//            shopReviewThanks.setItemID(idOfInsertedRow);
+            User userProfile = (User) Globals.accountApproved;
+            item.setEndUserID(userProfile.getUserID());
+
+
+            int idOfInsertedRow = favoriteItemDAOPrepared.saveFavouriteItem(item);
+
+            item.setItemID(idOfInsertedRow);
 
             if(idOfInsertedRow >=1)
             {
 
                 return Response.status(Response.Status.CREATED)
-                        .entity(itemReviewThanks)
+                        .entity(item)
                         .build();
 
-            }else {
+            }
+            else {
 
-                return Response.status(Response.Status.NOT_MODIFIED)
-                        .build();
+                    return Response.status(Response.Status.NOT_MODIFIED)
+                            .build();
             }
 
 
@@ -52,11 +66,15 @@ public class ItemReviewThanksResource {
 
         @DELETE
         @Produces(MediaType.APPLICATION_JSON)
-        public Response deleteItem(@QueryParam("ItemReviewID")Integer itemReviewID,
+        @RolesAllowed({GlobalConstants.ROLE_END_USER})
+        public Response deleteItem(@QueryParam("ItemID")Integer itemID,
                                    @QueryParam("EndUserID")Integer endUserID)
         {
 
-            int rowCount = thanksDAOPrepared.deleteItemReviewThanks(itemReviewID,endUserID);
+
+            User userProfile = (User) Globals.accountApproved;
+
+            int rowCount = favoriteItemDAOPrepared.deleteFavouriteItem(itemID,userProfile.getUserID());
 
 
             if(rowCount>=1)
@@ -65,25 +83,25 @@ public class ItemReviewThanksResource {
                 return Response.status(Response.Status.OK)
                         .build();
             }
-
-            if(rowCount == 0)
+            else
             {
 
                 return Response.status(Response.Status.NOT_MODIFIED)
                         .build();
             }
-
-            return null;
         }
+
+
+
+
 
 
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        public Response getItemReviewThanks(
-                @QueryParam("ItemReviewID")Integer itemReviewID,
-                @QueryParam("EndUserID")Integer endUserID,
+        public Response getFavouriteItems(
                 @QueryParam("ItemID")Integer itemID,
+                @QueryParam("EndUserID")Integer endUserID,
                 @QueryParam("SortBy") String sortBy,
                 @QueryParam("Limit")Integer limit, @QueryParam("Offset")Integer offset,
                 @QueryParam("metadata_only")Boolean metaonly)
@@ -113,20 +131,25 @@ public class ItemReviewThanksResource {
                 set_offset = offset;
             }
 
-            ItemReviewThanksEndpoint endPoint = thanksDAOPrepared.getEndPointMetadata(itemReviewID,endUserID);
+
+
+            System.out.println("ItemID : " + itemID + " | EndUserID : " + endUserID);
+
+
+            FavouriteItemEndpoint endPoint = favoriteItemDAOPrepared.getEndPointMetadata(itemID,endUserID);
 
             endPoint.setLimit(set_limit);
             endPoint.setMax_limit(max_limit);
             endPoint.setOffset(set_offset);
 
-            List<MarketReviewThanks> list = null;
+            List<FavouriteMarket> list = null;
 
 
             if(metaonly==null || (!metaonly)) {
 
                 list =
-                        thanksDAOPrepared.getItemReviewThanks(
-                                itemReviewID,itemID,endUserID,
+                        favoriteItemDAOPrepared.getFavouriteItem(
+                                itemID,endUserID,
                                 sortBy,set_limit,set_offset
                         );
 

@@ -256,6 +256,9 @@ public class UserSignUpRESTEndpoint {
 
 
 
+
+
+
     @PUT
     @Path("/SendEmailVerificationCode/{email}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -320,8 +323,8 @@ public class UserSignUpRESTEndpoint {
                     .p("This verification code will expire at " + verificationCode.getTimestampExpires().toLocaleString() + ". Please use this code before it expires.")
                     .mail()
                     .to(email)
-                    .subject("E-mail Verification Code for Taxi Referral Service (TRS)")
-                    .from("Taxi Referral Service","noreply@taxireferral.org")
+                    .subject("E-mail Verification Code for " + GlobalConstants.service_name_for_sms_value)
+                    .from("Nearby Shops","noreply@nearbyshops.org")
                     .build()
                     .send();
 

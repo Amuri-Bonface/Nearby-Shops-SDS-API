@@ -6,6 +6,9 @@ import org.nearbyshops.sds.Globals.GlobalConfig;
 import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Model.ServiceConfigurationGlobal;
+import org.nearbyshops.sds.ModelReviewMarket.FavouriteMarket;
+import org.nearbyshops.sds.ModelReviewMarket.MarketReview;
+import org.nearbyshops.sds.ModelReviewMarket.MarketReviewThanks;
 import org.nearbyshops.sds.ModelRoles.EmailVerificationCode;
 import org.nearbyshops.sds.ModelRoles.PhoneVerificationCode;
 import org.nearbyshops.sds.ModelRoles.StaffPermissions;
@@ -99,6 +102,13 @@ public class Main {
             // create table service configuration
             statement.executeUpdate(ServiceConfigurationGlobal.createTableServiceConfigurationPostgres);
 
+
+
+
+            // tables for shop reviews
+            statement.executeUpdate(MarketReview.createTablePostgres);
+            statement.executeUpdate(FavouriteMarket.createTablePostgres);
+            statement.executeUpdate(MarketReviewThanks.createTable);
 
 
 

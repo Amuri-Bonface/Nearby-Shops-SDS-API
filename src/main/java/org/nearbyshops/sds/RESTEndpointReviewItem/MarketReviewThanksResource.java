@@ -1,49 +1,48 @@
 package org.nearbyshops.sds.RESTEndpointReviewItem;
 
-
-import org.nearbyshops.sds.DAOPreparedReviewItem.FavoriteMarketDAO;
+import org.nearbyshops.sds.DAOPreparedReviewItem.MarketReviewThanksDAO;
 import org.nearbyshops.sds.Globals.Globals;
-import org.nearbyshops.sds.ModelReviewEndpoint.FavouriteItemEndpoint;
-import org.nearbyshops.sds.ModelReviewMarket.FavouriteMarket;
+import org.nearbyshops.sds.ModelReviewEndpoint.ItemReviewThanksEndpoint;
+import org.nearbyshops.sds.ModelReviewMarket.MarketReviewThanks;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.List;
 
 /**
  * Created by sumeet on 9/8/16.
  */
 
-@Path("/api/v1/FavouriteItem")
-public class FavouriteItemResource {
+
+@Path("/api/v1/MarketReviewThanks")
+public class MarketReviewThanksResource {
 
 
-    private FavoriteMarketDAO favoriteItemDAOPrepared = Globals.favoriteMarketDAO;
+    private MarketReviewThanksDAO thanksDAOPrepared = Globals.marketReviewThanksDAO;
+
 
 
         @POST
         @Produces(MediaType.APPLICATION_JSON)
         @Consumes(MediaType.APPLICATION_JSON)
-        public Response saveFavouriteBook(FavouriteMarket item)
+        public Response saveItemReviewThanks(MarketReviewThanks itemReviewThanks)
         {
-            int idOfInsertedRow = favoriteItemDAOPrepared.saveFavouriteItem(item);
+            int idOfInsertedRow = thanksDAOPrepared.saveItemReviewThanks(itemReviewThanks);
 
-            item.setItemID(idOfInsertedRow);
+//            shopReviewThanks.setItemID(idOfInsertedRow);
 
             if(idOfInsertedRow >=1)
             {
 
                 return Response.status(Response.Status.CREATED)
-                        .entity(item)
+                        .entity(itemReviewThanks)
                         .build();
 
-            }
-            else {
+            }else {
 
-                    return Response.status(Response.Status.NOT_MODIFIED)
-                            .build();
+                return Response.status(Response.Status.NOT_MODIFIED)
+                        .build();
             }
 
 
@@ -53,11 +52,11 @@ public class FavouriteItemResource {
 
         @DELETE
         @Produces(MediaType.APPLICATION_JSON)
-        public Response deleteItem(@QueryParam("ItemID")Integer itemID,
+        public Response deleteItem(@QueryParam("ItemReviewID")Integer itemReviewID,
                                    @QueryParam("EndUserID")Integer endUserID)
         {
 
-            int rowCount = favoriteItemDAOPrepared.deleteFavouriteItem(itemID,endUserID);
+            int rowCount = thanksDAOPrepared.deleteItemReviewThanks(itemReviewID,endUserID);
 
 
             if(rowCount>=1)
@@ -66,21 +65,25 @@ public class FavouriteItemResource {
                 return Response.status(Response.Status.OK)
                         .build();
             }
-            else
+
+            if(rowCount == 0)
             {
 
                 return Response.status(Response.Status.NOT_MODIFIED)
                         .build();
             }
+
+            return null;
         }
 
 
 
         @GET
         @Produces(MediaType.APPLICATION_JSON)
-        public Response getFavouriteItems(
-                @QueryParam("ItemID")Integer itemID,
+        public Response getItemReviewThanks(
+                @QueryParam("ItemReviewID")Integer itemReviewID,
                 @QueryParam("EndUserID")Integer endUserID,
+                @QueryParam("ItemID")Integer itemID,
                 @QueryParam("SortBy") String sortBy,
                 @QueryParam("Limit")Integer limit, @QueryParam("Offset")Integer offset,
                 @QueryParam("metadata_only")Boolean metaonly)
@@ -110,20 +113,20 @@ public class FavouriteItemResource {
                 set_offset = offset;
             }
 
-            FavouriteItemEndpoint endPoint = favoriteItemDAOPrepared.getEndPointMetadata(itemID,endUserID);
+            ItemReviewThanksEndpoint endPoint = thanksDAOPrepared.getEndPointMetadata(itemReviewID,endUserID);
 
             endPoint.setLimit(set_limit);
             endPoint.setMax_limit(max_limit);
             endPoint.setOffset(set_offset);
 
-            List<FavouriteMarket> list = null;
+            List<MarketReviewThanks> list = null;
 
 
             if(metaonly==null || (!metaonly)) {
 
                 list =
-                        favoriteItemDAOPrepared.getFavouriteItem(
-                                itemID,endUserID,
+                        thanksDAOPrepared.getItemReviewThanks(
+                                itemReviewID,itemID,endUserID,
                                 sortBy,set_limit,set_offset
                         );
 

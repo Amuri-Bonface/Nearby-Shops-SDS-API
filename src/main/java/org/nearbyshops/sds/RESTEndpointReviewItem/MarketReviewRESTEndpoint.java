@@ -18,8 +18,8 @@ import java.util.List;
  * Created by sumeet on 9/8/16.
  */
 
-@Path("/api/v1/ItemReview")
-public class ItemReviewRESTEndpoint {
+@Path("/api/v1/MarketReview")
+public class MarketReviewRESTEndpoint {
 
 
     private MarketReviewDAO itemReviewDAOPrepared = Globals.marketReviewDAO;
@@ -28,7 +28,7 @@ public class ItemReviewRESTEndpoint {
 
 //    BookReviewDAO bookReviewDAO;
 
-    public ItemReviewRESTEndpoint() {
+    public MarketReviewRESTEndpoint() {
 
     }
 

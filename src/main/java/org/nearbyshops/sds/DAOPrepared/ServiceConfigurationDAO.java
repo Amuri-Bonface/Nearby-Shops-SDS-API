@@ -6,6 +6,8 @@ import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Model.Endpoints.ServiceConfigurationEndPoint;
 import org.nearbyshops.sds.Model.ServiceConfigurationGlobal;
+import org.nearbyshops.sds.ModelReviewMarket.FavouriteMarket;
+import org.nearbyshops.sds.ModelReviewMarket.MarketReview;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -406,14 +408,15 @@ public class ServiceConfigurationDAO {
 
 
 
+//    Double proximity,
+//    Boolean isOfficial, Boolean isVerified,
+//    Integer serviceType,
 
 
     public ServiceConfigurationEndPoint getListQuerySimple(
             Double latCenter, Double lonCenter,
-            Double proximity,
             String serviceURL, String searchString,
-            Boolean isOfficial, Boolean isVerified,
-            Integer serviceType,
+            boolean getSavedMarkets,int endUserID,
             String sortBy,
             Integer limit, Integer offset
     )
@@ -432,6 +435,9 @@ public class ServiceConfigurationDAO {
                 + lonCenter + "))" + " + sin( radians(" + latCenter + ")) * sin(radians( " + ServiceConfigurationGlobal.LAT_CENTER + " ))) as distance" + ","
 
                 + "count(*) over() AS full_count " + ","
+
+                +  "avg(" + MarketReview.TABLE_NAME + "." + MarketReview.RATING + ") as avg_rating" + ","
+                +  "count( DISTINCT " + MarketReview.TABLE_NAME + "." + MarketReview.END_USER_ID + ") as rating_count" + ","
 
                 + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID + ","
                 + ServiceConfigurationGlobal.LOGO_IMAGE_PATH + ","
@@ -470,7 +476,24 @@ public class ServiceConfigurationDAO {
                 + ServiceConfigurationGlobal.UPDATED + ""
 
                 + " FROM " + ServiceConfigurationGlobal.TABLE_NAME
-                + " WHERE TRUE ";
+                + " LEFT OUTER JOIN " + MarketReview.TABLE_NAME  + " ON (" + MarketReview.TABLE_NAME + "." + MarketReview.ITEM_ID + " = " + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID + ")";
+
+
+                if(getSavedMarkets)
+                {
+                    queryNormal = queryNormal + " INNER JOIN " + FavouriteMarket.TABLE_NAME  + " ON (" + FavouriteMarket.TABLE_NAME + "." + FavouriteMarket.ITEM_ID + " = " + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID + ")";
+                }
+
+
+                queryNormal = queryNormal + " WHERE TRUE ";
+
+
+
+
+                if(getSavedMarkets)
+                {
+                    queryNormal = queryNormal + " AND " + FavouriteMarket.TABLE_NAME + "." + FavouriteMarket.END_USER_ID + " = " + endUserID;
+                }
 
 
 
@@ -531,73 +554,74 @@ public class ServiceConfigurationDAO {
 //        }
 
 
-        if(isOfficial!=null)
-        {
-            String queryPartOfficial = "";
 
-            queryPartOfficial = queryPartOfficial + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.IS_OFFICIAL_SERVICE_PROVIDER + " = " + isOfficial;
-
-//            if(isFirst)
-//            {
-//                queryNormal = queryNormal + " WHERE " + queryPartOfficial;
+//        if(isOfficial!=null)
+//        {
+//            String queryPartOfficial = "";
 //
-//                // reset the flag
-//                isFirst = false;
+//            queryPartOfficial = queryPartOfficial + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.IS_OFFICIAL_SERVICE_PROVIDER + " = " + isOfficial;
 //
-//            }else
-//            {
-//                queryNormal = queryNormal + " AND " + queryPartOfficial;
-//            }
-
-            queryNormal = queryNormal + " AND " + queryPartOfficial;
-        }
-
-
-
-        if(isVerified!=null)
-        {
-            String queryPartVerified = "";
-
-            queryPartVerified = queryPartVerified + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.IS_VERIFIED + " = " + isVerified;
-
-//            if(isFirst)
-//            {
-//                queryNormal = queryNormal + " WHERE " + queryPartVerified;
+////            if(isFirst)
+////            {
+////                queryNormal = queryNormal + " WHERE " + queryPartOfficial;
+////
+////                // reset the flag
+////                isFirst = false;
+////
+////            }else
+////            {
+////                queryNormal = queryNormal + " AND " + queryPartOfficial;
+////            }
 //
-//                // reset the flag
-//                isFirst = false;
+//            queryNormal = queryNormal + " AND " + queryPartOfficial;
+//        }
 //
-//            }else
-//            {
-//                queryNormal = queryNormal + " AND " + queryPartVerified;
-//            }
-
-            queryNormal = queryNormal + " AND " + queryPartVerified;
-        }
-
-
-
-        if(serviceType!=null)
-        {
-            String queryPartServiceType = "";
-
-            queryPartServiceType = queryPartServiceType + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.SERVICE_TYPE + " = " + serviceType;
-
-//            if(isFirst)
-//            {
-//                queryNormal = queryNormal + " WHERE " + queryPartServiceType;
 //
-//                // reset the flag
-//                isFirst = false;
 //
-//            }else
-//            {
-//                queryNormal = queryNormal + " AND " + queryPartServiceType;
-//            }
-
-
-            queryNormal = queryNormal + " AND " + queryPartServiceType;
-        }
+//        if(isVerified!=null)
+//        {
+//            String queryPartVerified = "";
+//
+//            queryPartVerified = queryPartVerified + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.IS_VERIFIED + " = " + isVerified;
+//
+////            if(isFirst)
+////            {
+////                queryNormal = queryNormal + " WHERE " + queryPartVerified;
+////
+////                // reset the flag
+////                isFirst = false;
+////
+////            }else
+////            {
+////                queryNormal = queryNormal + " AND " + queryPartVerified;
+////            }
+//
+//            queryNormal = queryNormal + " AND " + queryPartVerified;
+//        }
+//
+//
+//
+//        if(serviceType!=null)
+//        {
+//            String queryPartServiceType = "";
+//
+//            queryPartServiceType = queryPartServiceType + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.SERVICE_TYPE + " = " + serviceType;
+//
+////            if(isFirst)
+////            {
+////                queryNormal = queryNormal + " WHERE " + queryPartServiceType;
+////
+////                // reset the flag
+////                isFirst = false;
+////
+////            }else
+////            {
+////                queryNormal = queryNormal + " AND " + queryPartServiceType;
+////            }
+//
+//
+//            queryNormal = queryNormal + " AND " + queryPartServiceType;
+//        }
 
 
 
@@ -652,14 +676,16 @@ public class ServiceConfigurationDAO {
 
 
 
-//
-//        String queryGroupBy = "";
-//
-//        queryGroupBy = queryGroupBy + " group by "
-//                + Shop.TABLE_NAME + "." + Shop.SHOP_ID ;
-//
 
-//        queryNormal = queryNormal + queryGroupBy;
+
+
+        String queryGroupBy = "";
+
+        queryGroupBy = queryGroupBy + " group by "
+                + ServiceConfigurationGlobal.TABLE_NAME + "." + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID ;
+
+
+        queryNormal = queryNormal + queryGroupBy;
 
 
 
@@ -729,6 +755,8 @@ public class ServiceConfigurationDAO {
                 ServiceConfigurationGlobal sc = new ServiceConfigurationGlobal();
 
                 sc.setRt_distance(rs.getDouble("distance"));
+                sc.setRt_rating_avg(rs.getFloat("avg_rating"));
+                sc.setRt_rating_count(rs.getFloat("rating_count"));
 
                 sc.setServiceID(rs.getInt(ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID));
                 sc.setLogoImagePath(rs.getString(ServiceConfigurationGlobal.LOGO_IMAGE_PATH));
