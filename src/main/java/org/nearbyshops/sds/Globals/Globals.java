@@ -13,6 +13,10 @@ import org.nearbyshops.sds.DAORoles.*;
 import org.nearbyshops.sds.Model.ServiceConfigurationLocal;
 import org.nearbyshops.sds.Model.ServiceConfigurationGlobal;
 import org.nearbyshops.sds.ModelReviewMarket.FavouriteMarket;
+import org.simplejavamail.email.Email;
+import org.simplejavamail.email.EmailBuilder;
+import org.simplejavamail.mailer.Mailer;
+import org.simplejavamail.mailer.MailerBuilder;
 
 import javax.ws.rs.core.MediaType;
 import java.security.SecureRandom;
@@ -222,7 +226,7 @@ public class Globals {
 			configurationMailgun = new Configuration()
 					.domain(GlobalConstants.MAILGUN_DOMAIN)
 					.apiKey(GlobalConstants.MAILGUN_API_KEY)
-					.from(GlobalConstants.MAILGUN_NAME,GlobalConstants.MAILGUN_EMAIL);
+					.from(GlobalConstants.MAILGUN_NAME, GlobalConstants.MAILGUN_EMAIL);
 
 			return configurationMailgun;
 		}
@@ -232,6 +236,52 @@ public class Globals {
 		}
 	}
 
+
+
+
+
+
+
+
+
+
+	public static void sendEmail(String email_address, String subject, String message)
+	{
+		Email email = EmailBuilder.startingBlank()
+				.from("AppDeveloperCafe", "noreply@appdevelopercafe.com")
+				.to("mom",email_address)
+				.withSubject(subject)
+				.withPlainText(message)
+				.buildEmail();
+
+
+		getMailerInstance().sendMail(email);
+	}
+
+
+
+
+
+
+
+	public static Mailer inHouseMailer;
+
+
+	public static Mailer getMailerInstance()
+	{
+		if(inHouseMailer==null)
+		{
+			inHouseMailer = MailerBuilder
+					.withSMTPServer("smtp.mailgun.org", 587, "postmaster@appdevelopercafe.com", "7c54a64f2941b6ef04519ecf58843c25")
+					.buildMailer();
+
+			return inHouseMailer;
+		}
+		else
+		{
+			return inHouseMailer;
+		}
+	}
 
 
 }

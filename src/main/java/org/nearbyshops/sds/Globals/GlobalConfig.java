@@ -43,6 +43,7 @@ public class GlobalConfig {
         GlobalConstants.ADMIN_PASSWORD = configuration.getString("admin_password");
 
 
+
         GlobalConstants.MAILGUN_DOMAIN = configuration.getString("mailgun.domain");
         GlobalConstants.MAILGUN_API_KEY = configuration.getString("mailgun.apikey");
         GlobalConstants.MAILGUN_NAME = configuration.getString("mailgun.name");
@@ -93,6 +94,12 @@ public class GlobalConfig {
         System.out.println("Postgres Password : " + GlobalConstants.POSTGRES_PASSWORD);
 
         System.out.println("MSG91_KEY : " + GlobalConstants.MSG91_SMS_SERVICE_API_KEY);
+
+        System.out.println("Mailgun Domain : " + GlobalConstants.MAILGUN_DOMAIN);
+        System.out.println("Mailgun API-KEY : " + GlobalConstants.MAILGUN_API_KEY);
+        System.out.println("Mailgun Name : " + GlobalConstants.MAILGUN_NAME);
+        System.out.println("Mailgun E-mail : " + GlobalConstants.MAILGUN_EMAIL);
+
 
 
         System.out.println("Token Duration Minutes : " + GlobalConstants.TOKEN_DURATION_MINUTES);

@@ -1,8 +1,7 @@
 package org.nearbyshops.sds.DAOPrepared;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import com.zaxxer.hikari.HikariDataSource;
-import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Model.Endpoints.ServiceConfigurationEndPoint;
 import org.nearbyshops.sds.Model.ServiceConfigurationGlobal;

@@ -354,89 +354,103 @@ public class ServiceConfigurationResource {
 	)
 	{
 
-		final String encodedUserPassword = headerParam.replaceFirst(AUTHENTICATION_SCHEME + " ", "");
+			User user = null;
 
-		//Decode username and password
-		String usernameAndPassword = new String(Base64.getDecoder().decode(encodedUserPassword.getBytes()));
-
-		//Split username and password tokens
-		final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
-		final String username = tokenizer.nextToken();
-		final String password = tokenizer.nextToken();
-
-
-		User user = daoUser.verifyUser(username,password);
-
-
-
-
-
-		final int max_limit = 100;
-
-		if(limit!=null)
-		{
-			if(limit>=max_limit)
+			if(headerParam!=null)
 			{
-				limit = max_limit;
-			}
-		}
-		else
-		{
-			limit = 30;
-		}
+				final String encodedUserPassword = headerParam.replaceFirst(AUTHENTICATION_SCHEME + " ", "");
+
+				//Decode username and password
+				String usernameAndPassword = new String(Base64.getDecoder().decode(encodedUserPassword.getBytes()));
+
+				//Split username and password tokens
+				final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
+				final String username = tokenizer.nextToken();
+				final String password = tokenizer.nextToken();
 
 
-
-
-		ServiceConfigurationEndPoint endPoint = serviceConfigDAO.getListQuerySimple(
-									latCenter,lonCenter,
-									serviceURL,searchString,
-									false,0,
-									sortBy,limit,offset);
-
-
-		endPoint.setLimit(limit);
-		endPoint.setMax_limit(max_limit);
-		endPoint.setOffset(offset);
-
-
-
-		if(user!=null)
-		{
-			// get saved markets
-
-			List<ServiceConfigurationGlobal> savedMarkets = serviceConfigDAO.getListQuerySimple(
-																	latCenter,lonCenter,
-																	serviceURL,searchString,
-																	true,user.getUserID(),
-																	sortBy,limit,offset)
-					.getResults();
-
-
-			if(savedMarkets.size()>0)
-			{
-				endPoint.setSavedMarkets(savedMarkets);
+				user = daoUser.verifyUser(username,password);
 			}
 
 
-			System.out.println("Saved Markets List Size : " + savedMarkets.size());
-
-		}
-
-
-		/*try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}*/
 
 
 
-		//Marker
-		return Response.status(Status.OK)
-				.entity(endPoint)
-				.build();
+
+			final int max_limit = 100;
+
+			if(limit!=null)
+			{
+				if(limit>=max_limit)
+				{
+					limit = max_limit;
+				}
+			}
+			else
+			{
+				limit = 30;
+			}
+
+
+
+
+			ServiceConfigurationEndPoint endPoint = serviceConfigDAO.getListQuerySimple(
+					latCenter,lonCenter,
+					serviceURL,searchString,
+					false,0,
+					sortBy,limit,offset);
+
+
+			endPoint.setLimit(limit);
+			endPoint.setMax_limit(max_limit);
+			endPoint.setOffset(offset);
+
+
+
+			if(user!=null)
+			{
+				// get saved markets
+
+				List<ServiceConfigurationGlobal> savedMarkets = serviceConfigDAO.getListQuerySimple(
+						latCenter,lonCenter,
+						serviceURL,searchString,
+						true,user.getUserID(),
+						sortBy,limit,offset)
+						.getResults();
+
+
+				if(savedMarkets.size()>0)
+				{
+					endPoint.setSavedMarkets(savedMarkets);
+				}
+
+
+//				System.out.println("Saved Markets List Size : " + savedMarkets.size());
+			}
+
+
+
+						System.out.println("Saved Markets List Size : " + endPoint.getResults().size());
+
+			/*try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}*/
+
+
+
+			//Marker
+			return Response.status(Status.OK)
+					.entity(endPoint)
+					.build();
 	}
+
+
+
+
+
+
 
 
 
