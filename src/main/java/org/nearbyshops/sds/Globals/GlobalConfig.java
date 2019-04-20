@@ -43,11 +43,21 @@ public class GlobalConfig {
         GlobalConstants.ADMIN_PASSWORD = configuration.getString("admin_password");
 
 
+        GlobalConstants.SMTP_SERVER_URL = configuration.getString("smtp_server_url");
+        GlobalConstants.SMTP_PORT = configuration.getInt("smtp_port");
+        GlobalConstants.SMTP_USERNAME = configuration.getString("smtp_username");
+        GlobalConstants.SMTP_PASSWORD = configuration.getString("smtp_password");
 
-        GlobalConstants.MAILGUN_DOMAIN = configuration.getString("mailgun.domain");
-        GlobalConstants.MAILGUN_API_KEY = configuration.getString("mailgun.apikey");
-        GlobalConstants.MAILGUN_NAME = configuration.getString("mailgun.name");
-        GlobalConstants.MAILGUN_EMAIL = configuration.getString("mailgun.email");
+
+        GlobalConstants.EMAIL_SENDER_NAME = configuration.getString("email_sender_name");
+        GlobalConstants.EMAIL_ADDRESS_FOR_SENDER = configuration.getString("email_address_for_sender");
+
+
+
+//        GlobalConstants.MAILGUN_DOMAIN = configuration.getString("mailgun.domain");
+//        GlobalConstants.MAILGUN_API_KEY = configuration.getString("mailgun.apikey");
+//        GlobalConstants.MAILGUN_NAME = configuration.getString("mailgun.name");
+//        GlobalConstants.MAILGUN_EMAIL = configuration.getString("mailgun.email");
 
 
         GlobalConstants.max_service_range = configuration.getInt("max_market_visibility_range");
@@ -95,10 +105,21 @@ public class GlobalConfig {
 
         System.out.println("MSG91_KEY : " + GlobalConstants.MSG91_SMS_SERVICE_API_KEY);
 
-        System.out.println("Mailgun Domain : " + GlobalConstants.MAILGUN_DOMAIN);
-        System.out.println("Mailgun API-KEY : " + GlobalConstants.MAILGUN_API_KEY);
-        System.out.println("Mailgun Name : " + GlobalConstants.MAILGUN_NAME);
-        System.out.println("Mailgun E-mail : " + GlobalConstants.MAILGUN_EMAIL);
+
+        System.out.println("SMTP URL : " + GlobalConstants.SMTP_SERVER_URL);
+        System.out.println("SMTP PORT : " + GlobalConstants.SMTP_PORT);
+        System.out.println("SMTP USERNAME : " + GlobalConstants.SMTP_USERNAME);
+        System.out.println("SMTP PASSWORD : " + GlobalConstants.SMTP_PASSWORD);
+
+        System.out.println("Email Sender Name : " + GlobalConstants.EMAIL_SENDER_NAME);
+        System.out.println("Email Address : " + GlobalConstants.EMAIL_ADDRESS_FOR_SENDER);
+
+
+
+//        System.out.println("Mailgun Domain : " + GlobalConstants.MAILGUN_DOMAIN);
+//        System.out.println("Mailgun API-KEY : " + GlobalConstants.MAILGUN_API_KEY);
+//        System.out.println("Mailgun Name : " + GlobalConstants.MAILGUN_NAME);
+//        System.out.println("Mailgun E-mail : " + GlobalConstants.MAILGUN_EMAIL);
 
 
 

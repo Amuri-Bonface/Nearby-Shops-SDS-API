@@ -140,6 +140,8 @@ public class User {
     private boolean isVerified;
 
 
+    private String rt_phone_country_code;
+
     private String rt_email_verification_code;
     private String rt_phone_verification_code;
     private int rt_registration_mode; // 1 for registration by email 2 for registration by phone
@@ -155,6 +157,18 @@ public class User {
 
 
 
+    // utility functions
+
+
+
+    public String getPhoneWithCountryCode()
+    {
+        return (rt_phone_country_code + phone);
+    }
+
+
+
+
 
 
 
@@ -162,6 +176,13 @@ public class User {
     // Getters and Setters
 
 
+    public String getRt_phone_country_code() {
+        return rt_phone_country_code;
+    }
+
+    public void setRt_phone_country_code(String rt_phone_country_code) {
+        this.rt_phone_country_code = rt_phone_country_code;
+    }
 
     public String getRt_oneSignalPlayerID() {
         return rt_oneSignalPlayerID;

@@ -1,6 +1,6 @@
 package org.nearbyshops.sds.RESTEndpointsLogin;
 
-import net.sargue.mailgun.Mail;
+
 import org.nearbyshops.sds.DAORoles.DAOUserSignUp;
 import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
@@ -8,6 +8,8 @@ import org.nearbyshops.sds.Globals.SendSMS;
 import org.nearbyshops.sds.ModelRoles.EmailVerificationCode;
 import org.nearbyshops.sds.ModelRoles.PhoneVerificationCode;
 import org.nearbyshops.sds.ModelRoles.User;
+import org.simplejavamail.email.Email;
+import org.simplejavamail.email.EmailBuilder;
 
 
 import javax.annotation.security.RolesAllowed;
@@ -17,6 +19,8 @@ import javax.ws.rs.core.Response;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Random;
+
+import static org.nearbyshops.sds.Globals.Globals.getMailerInstance;
 
 /**
  * Created by sumeet on 14/8/17.
@@ -105,19 +109,40 @@ public class UserSignUpRESTEndpoint {
 
             if(idOfInsertedRow>=1)
             {
-                // registration successful therefore send email to notify the user
-                Mail.using(Globals.getMailgunConfiguration())
-                        .body()
-                        .h1("Registration successful for your account")
-                        .p("Your account has been Created.")
-                        .h3("Your E-mail : " + user.getEmail())
-                        .p("You can login with your email and password that you have provided. Thank you for registering with Nearby Shops.")
-                        .mail()
-                        .to(user.getEmail())
-                        .subject("Nearby Shops : Account Registered")
-                        .from("Nearby Shops","noreply@nearbyshops.org")
-                        .build()
-                        .send();
+
+
+//                // registration successful therefore send email to notify the user
+//                Mail.using(Globals.getMailgunConfiguration())
+//                        .body()
+//                        .h1("Registration successful for your account")
+//                        .p("Your account has been Created.")
+//                        .h3("Your E-mail : " + user.getEmail())
+//                        .p("You can login with your email and password that you have provided. Thank you for registering with Nearby Shops.")
+//                        .mail()
+//                        .to(user.getEmail())
+//                        .subject("Nearby Shops : Account Registered")
+//                        .from("Nearby Shops","noreply@nearbyshops.org")
+//                        .build()
+//                        .send();
+
+
+                String message = "Your account has been Created. Your E-mail is : "+ user.getEmail()
+                        + ". You can login with your email and password that you have provided. Thank you for creating your account.";
+
+
+
+//                Globals.sendEmail(user.getEmail(),user.getEmail(),"Registration successful for your account",message);
+
+
+                Email email = EmailBuilder.startingBlank()
+                        .from(GlobalConstants.EMAIL_SENDER_NAME, GlobalConstants.EMAIL_ADDRESS_FOR_SENDER)
+                        .to(user.getName(),user.getEmail())
+                        .withSubject("Registration successful for your account")
+                        .withPlainText(message)
+                        .buildEmail();
+
+
+                getMailerInstance().sendMail(email,true);
 
 
 
@@ -139,14 +164,14 @@ public class UserSignUpRESTEndpoint {
 
 
 
-//            System.out.println("Phone : " + user.getPhone()
-//                    + "\nEmail : " + user.getEmail()
-//                    + "\nPassword : " + user.getPassword()
-//                    + "\nRegistration Mode : " + user.getRt_registration_mode()
-//                    + "\nName : " + user.getName()
-//                    + "\nInsert Count : " + idOfInsertedRow
-//                    + "\nVerificationCode : " + user.getRt_phone_verification_code()
-//            );
+            System.out.println("Phone : " + user.getPhone()
+                    + "\nEmail : " + user.getEmail()
+                    + "\nPassword : " + user.getPassword()
+                    + "\nRegistration Mode : " + user.getRt_registration_mode()
+                    + "\nName : " + user.getName()
+                    + "\nInsert Count : " + idOfInsertedRow
+                    + "\nVerificationCode : " + user.getRt_phone_verification_code()
+            );
 
             // send notification to the mobile number via SMS
 
@@ -192,7 +217,7 @@ public class UserSignUpRESTEndpoint {
 
 //        System.out.println(username);
 
-
+//
 //        try {
 //            Thread.sleep(1000);
 //        } catch (InterruptedException e) {
@@ -293,18 +318,46 @@ public class UserSignUpRESTEndpoint {
                 // saved successfully
 
 
-                Mail.using(Globals.getMailgunConfiguration())
-                        .body()
-                        .h1("Your E-mail Verification Code is given below")
-                        .p("You have requested to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.")
-                        .h3("The e-mail verification code is : " + emailVerificationCode)
-                        .p("This verification code will expire at " + timestampExpiry.toLocaleString() + ". Please use this code before it expires.")
-                        .mail()
-                        .to(email)
-                        .subject("E-mail Verification Code for Taxi Referral Service (TRS)")
-                        .from("Taxi Referral Service","noreply@taxireferral.org")
-                        .build()
-                        .send();
+//                Mail.using(Globals.getMailgunConfiguration())
+//                        .body()
+//                        .h1("Your E-mail Verification Code is given below")
+//                        .p("You have requested to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.")
+//                        .h3("The e-mail verification code is : " + emailVerificationCode)
+//                        .p("This verification code will expire at " + timestampExpiry.toLocaleString() + ". Please use this code before it expires.")
+//                        .mail()
+//                        .to(email)
+//                        .subject("E-mail Verification Code for Taxi Referral Service (TRS)")
+//                        .from("Taxi Referral Service","noreply@taxireferral.org")
+//                        .build()
+//                        .send();
+
+
+
+//                String message = "Your account has been Created. Your E-mail is : "+ user.getEmail()
+//                        + ". You can login with your email and password that you have provided. Thank you for creating your account.";
+
+
+                String htmlText = "";
+
+
+
+                htmlText = "<p>You have made a request to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.</p>"
+                        + "<h2>The e-mail verification code is : " + emailVerificationCode + "</h2>" +
+                        "<p>This verification code will expire at " +
+                        timestampExpiry.toLocalDateTime().getHour() + ":" + timestampExpiry.toLocalDateTime().getMinute()
+                        + ". Please use this code before it expires.<p>";
+
+
+
+                Email emailComposed = EmailBuilder.startingBlank()
+                        .from(GlobalConstants.EMAIL_SENDER_NAME, GlobalConstants.EMAIL_ADDRESS_FOR_SENDER)
+                        .to("user",email)
+                        .withSubject("E-mail Verification Code")
+                        .withHTMLText(htmlText)
+                        .buildEmail();
+
+                getMailerInstance().sendMail(emailComposed,true);
+
 
             }
 
@@ -315,19 +368,36 @@ public class UserSignUpRESTEndpoint {
 
             System.out.println("Email Verification Code : " + verificationCode.getVerificationCode());
 
-            Mail.using(Globals.getMailgunConfiguration())
-                    .body()
-                    .h1("Your E-mail Verification Code is given below")
-                    .p("You have requested to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.")
-                    .h3("The e-mail verification code is : " + verificationCode.getVerificationCode())
-                    .p("This verification code will expire at " + verificationCode.getTimestampExpires().toLocaleString() + ". Please use this code before it expires.")
-                    .mail()
-                    .to(email)
-                    .subject("E-mail Verification Code for " + GlobalConstants.service_name_for_sms_value)
-                    .from("Nearby Shops","noreply@nearbyshops.org")
-                    .build()
-                    .send();
+//            Mail.using(Globals.getMailgunConfiguration())
+//                    .body()
+//                    .h1("Your E-mail Verification Code is given below")
+//                    .p("You have requested to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.")
+//                    .h3("The e-mail verification code is : " + verificationCode.getVerificationCode())
+//                    .p("This verification code will expire at " + verificationCode.getTimestampExpires().toLocaleString() + ". Please use this code before it expires.")
+//                    .mail()
+//                    .to(email)
+//                    .subject("E-mail Verification Code for " + GlobalConstants.service_name_for_sms_value)
+//                    .from("Nearby Shops","noreply@nearbyshops.org")
+//                    .build()
+//                    .send();
 
+
+
+                String htmlText = "";
+
+                htmlText = "<p>You have made a request to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.</p>"
+                        + "<h2>The e-mail verification code is : " + verificationCode.getVerificationCode() + "</h2>" +
+                        "<p>This verification code will expire at " + verificationCode.getTimestampExpires().toLocalDateTime().toString() + ". Please use this code before it expires.<p>";
+
+
+                Email emailComposed = EmailBuilder.startingBlank()
+                        .from(GlobalConstants.EMAIL_SENDER_NAME, GlobalConstants.EMAIL_ADDRESS_FOR_SENDER)
+                        .to("user",email)
+                        .withSubject("E-mail Verification Code")
+                        .withHTMLText(htmlText)
+                        .buildEmail();
+
+                getMailerInstance().sendMail(emailComposed,true);
 
             rowCount = 1;
         }

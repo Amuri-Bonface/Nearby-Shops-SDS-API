@@ -2,7 +2,7 @@ package org.nearbyshops.sds.Globals;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import net.sargue.mailgun.Configuration;
+
 import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseBroadcaster;
 import org.nearbyshops.sds.DAOPrepared.ServiceConfigurationDAO;
@@ -212,32 +212,31 @@ public class Globals {
 
 
 
+
+
 //    // mailgun configuration
 
-	private static Configuration configurationMailgun;
-
-
-	public static Configuration getMailgunConfiguration()
-	{
-
-		if(configurationMailgun==null)
-		{
-
-			configurationMailgun = new Configuration()
-					.domain(GlobalConstants.MAILGUN_DOMAIN)
-					.apiKey(GlobalConstants.MAILGUN_API_KEY)
-					.from(GlobalConstants.MAILGUN_NAME, GlobalConstants.MAILGUN_EMAIL);
-
-			return configurationMailgun;
-		}
-		else
-		{
-			return configurationMailgun;
-		}
-	}
-
-
-
+//	private static Configuration configurationMailgun;
+//
+//
+//	public static Configuration getMailgunConfiguration()
+//	{
+//
+//		if(configurationMailgun==null)
+//		{
+//
+//			configurationMailgun = new Configuration()
+//					.domain(GlobalConstants.MAILGUN_DOMAIN)
+//					.apiKey(GlobalConstants.MAILGUN_API_KEY)
+//					.from(GlobalConstants.MAILGUN_NAME, GlobalConstants.MAILGUN_EMAIL);
+//
+//			return configurationMailgun;
+//		}
+//		else
+//		{
+//			return configurationMailgun;
+//		}
+//	}
 
 
 
@@ -245,17 +244,19 @@ public class Globals {
 
 
 
-	public static void sendEmail(String email_address, String subject, String message)
+
+
+
+	public static void sendEmail(String email_address, String name_of_receiver, String subject, String message)
 	{
 		Email email = EmailBuilder.startingBlank()
-				.from("AppDeveloperCafe", "noreply@appdevelopercafe.com")
-				.to("mom",email_address)
+				.from(GlobalConstants.EMAIL_SENDER_NAME, GlobalConstants.EMAIL_ADDRESS_FOR_SENDER)
+				.to(name_of_receiver,email_address)
 				.withSubject(subject)
 				.withPlainText(message)
 				.buildEmail();
 
-
-		getMailerInstance().sendMail(email);
+		getMailerInstance().sendMail(email,true);
 	}
 
 
@@ -272,7 +273,8 @@ public class Globals {
 		if(inHouseMailer==null)
 		{
 			inHouseMailer = MailerBuilder
-					.withSMTPServer("smtp.mailgun.org", 587, "postmaster@appdevelopercafe.com", "7c54a64f2941b6ef04519ecf58843c25")
+					.withSMTPServer(GlobalConstants.SMTP_SERVER_URL, GlobalConstants.SMTP_PORT,
+							GlobalConstants.SMTP_USERNAME, GlobalConstants.SMTP_PASSWORD)
 					.buildMailer();
 
 			return inHouseMailer;

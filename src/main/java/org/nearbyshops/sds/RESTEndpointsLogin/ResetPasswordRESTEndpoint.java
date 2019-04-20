@@ -2,7 +2,7 @@ package org.nearbyshops.sds.RESTEndpointsLogin;
 
 
 
-import net.sargue.mailgun.Mail;
+
 import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Globals.SendSMS;
@@ -193,7 +193,9 @@ public class ResetPasswordRESTEndpoint {
                             "  | This verification code will expire at " + timestampExpiry.toLocaleString() + ". Please use this code before it expires.";
 
 
-                    Globals.sendEmail(user.getEmail(),"E-mail Verification Code",message);
+
+                    Globals.sendEmail(user.getEmail(),user.getEmail(),"E-mail Verification Code",message);
+
 
                 }
                 else if(user.getRt_registration_mode()==User.REGISTRATION_MODE_PHONE)
@@ -236,7 +238,8 @@ public class ResetPasswordRESTEndpoint {
                         "  | This verification code will expire at " + user_credentials.getResetCodeExpires().toLocaleString() + ". Please use this code before it expires.";
 
 
-                Globals.sendEmail(user.getEmail(),"E-mail Verification Code",message);
+
+                Globals.sendEmail(user.getEmail(),user.getEmail(),"E-mail Verification Code",message);
 
 
 

@@ -119,11 +119,11 @@
         <!--</dependency>-->
 
 
-        <dependency>
-            <groupId>net.sargue</groupId>
-            <artifactId>mailgun</artifactId>
-            <version>1.9.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>net.sargue</groupId>-->
+            <!--<artifactId>mailgun</artifactId>-->
+            <!--<version>1.9.0</version>-->
+        <!--</dependency>-->
 
 
 
