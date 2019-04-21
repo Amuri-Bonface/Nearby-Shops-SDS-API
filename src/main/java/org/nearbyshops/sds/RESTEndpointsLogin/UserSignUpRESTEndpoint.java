@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Random;
 
+import static org.nearbyshops.sds.Globals.Globals.generateOTP;
 import static org.nearbyshops.sds.Globals.Globals.getMailerInstance;
 
 /**
@@ -126,8 +127,9 @@ public class UserSignUpRESTEndpoint {
 //                        .send();
 
 
-                String message = "Your account has been Created. Your E-mail is : "+ user.getEmail()
-                        + ". You can login with your email and password that you have provided. Thank you for creating your account.";
+                String message = "<h2>Your account has been Created. Your E-mail is : "+ user.getEmail() + ".</h2>"
+                        + "<p>You can login with your email and password that you have provided. Thank you for creating your account.<p>";
+
 
 
 
@@ -138,7 +140,7 @@ public class UserSignUpRESTEndpoint {
                         .from(GlobalConstants.EMAIL_SENDER_NAME, GlobalConstants.EMAIL_ADDRESS_FOR_SENDER)
                         .to(user.getName(),user.getEmail())
                         .withSubject("Registration successful for your account")
-                        .withPlainText(message)
+                        .withHTMLText(message)
                         .buildEmail();
 
 
@@ -299,7 +301,10 @@ public class UserSignUpRESTEndpoint {
         {
             // verification code not generated for this email so generate one and send this to the user
 
-            String emailVerificationCode = new BigInteger(30, Globals.random).toString(32);
+//            String emailVerificationCode = new BigInteger(30, Globals.random).toString(32);
+            String emailVerificationCode = String.valueOf(Globals.generateOTP(5));
+
+
 
             Timestamp timestampExpiry
                     = new Timestamp(
@@ -311,6 +316,8 @@ public class UserSignUpRESTEndpoint {
             rowCount = Globals.daoEmailVerificationCodes.insertEmailVerificationCode(
                     email,emailVerificationCode,timestampExpiry,true
             );
+
+
 
 
             if(rowCount==1)
@@ -640,19 +647,6 @@ public class UserSignUpRESTEndpoint {
 
 
 
-
-
-    private static char[] generateOTP(int length) {
-        String numbers = "1234567890";
-        Random random = new Random();
-        char[] otp = new char[length];
-
-        for(int i = 0; i< length ; i++) {
-            otp[i] = numbers.charAt(random.nextInt(numbers.length()));
-        }
-
-        return otp;
-    }
 
 
 

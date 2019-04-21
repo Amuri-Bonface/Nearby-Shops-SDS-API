@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
 public class Globals {
@@ -284,6 +285,33 @@ public class Globals {
 			return inHouseMailer;
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+	private static Random randomNew = new Random();
+
+
+	public static char[] generateOTP(int length) {
+		String numbers = "1234567890";
+
+		char[] otp = new char[length];
+
+		for(int i = 0; i< length ; i++) {
+			otp[i] = numbers.charAt(randomNew.nextInt(numbers.length()));
+		}
+
+		return otp;
+	}
+
 
 
 }

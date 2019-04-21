@@ -430,7 +430,7 @@ public class ServiceConfigurationResource {
 
 
 
-						System.out.println("Saved Markets List Size : " + endPoint.getResults().size());
+//						System.out.println("Saved Markets List Size : " + endPoint.getResults().size());
 
 			/*try {
 				Thread.sleep(1000);

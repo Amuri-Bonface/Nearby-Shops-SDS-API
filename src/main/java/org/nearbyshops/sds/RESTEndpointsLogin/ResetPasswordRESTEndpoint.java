@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.Random;
 
 /**
  * Created by sumeet on 14/8/17.
@@ -148,9 +149,13 @@ public class ResetPasswordRESTEndpoint {
             // code is expired
 
 //            resetCode = new BigInteger(30, Globals.random).toString(32);
-            BigInteger phoneCode = new BigInteger(15, Globals.random);
-            int phoneOTP = phoneCode.intValue();
-            resetCode = String.valueOf(phoneOTP);
+
+
+//            BigInteger phoneCode = new BigInteger(15, Globals.random);
+//            int phoneOTP = phoneCode.intValue();
+//            resetCode = String.valueOf(phoneOTP);
+
+            resetCode = String.valueOf(Globals.generateOTP(5));
 
 
             timestampExpiry
@@ -275,6 +280,7 @@ public class ResetPasswordRESTEndpoint {
 
         return null;
     }
+
 
 
 
