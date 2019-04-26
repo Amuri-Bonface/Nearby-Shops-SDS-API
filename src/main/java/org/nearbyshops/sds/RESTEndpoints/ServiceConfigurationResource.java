@@ -412,11 +412,12 @@ public class ServiceConfigurationResource {
 				// get saved markets
 
 				List<ServiceConfigurationGlobal> savedMarkets = serviceConfigDAO.getListQuerySimple(
-						latCenter,lonCenter,
-						serviceURL,searchString,
+						null,null,
+						null,null,
 						true,user.getUserID(),
-						sortBy,limit,offset)
+						sortBy,null,null)
 						.getResults();
+
 
 
 				if(savedMarkets.size()>0)

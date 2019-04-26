@@ -7,6 +7,8 @@ import org.nearbyshops.sds.Globals.GlobalConstants;
 import org.nearbyshops.sds.Globals.Globals;
 import org.nearbyshops.sds.Globals.SendSMS;
 import org.nearbyshops.sds.ModelRoles.User;
+import org.simplejavamail.email.Email;
+import org.simplejavamail.email.EmailBuilder;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -14,6 +16,8 @@ import javax.ws.rs.core.Response;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Random;
+
+import static org.nearbyshops.sds.Globals.Globals.getMailerInstance;
 
 /**
  * Created by sumeet on 14/8/17.
@@ -194,12 +198,38 @@ public class ResetPasswordRESTEndpoint {
 //                            .send();
 
 
-                    String message = "The e-mail verification code is : " + resetCode +
-                            "  | This verification code will expire at " + timestampExpiry.toLocaleString() + ". Please use this code before it expires.";
+
+//                    String message = "The e-mail verification code is : " + resetCode +
+//                            "  | This verification code will expire at " + timestampExpiry.toLocaleString() + ". Please use this code before it expires.";
+//
+//
+//
+//                    Globals.sendEmail(user.getEmail(),user.getEmail(),"E-mail Verification Code",message);
 
 
 
-                    Globals.sendEmail(user.getEmail(),user.getEmail(),"E-mail Verification Code",message);
+                        String htmlText = "";
+
+
+
+                        htmlText = "<p>You have made a request to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.</p>"
+                                + "<h2>The e-mail verification code is : " + resetCode + "</h2>" +
+                                "<p>This verification code will expire at " +
+                                timestampExpiry.toLocalDateTime().getHour() + ":" + timestampExpiry.toLocalDateTime().getMinute() + ":"+ timestampExpiry.toLocalDateTime().getSecond()
+                                + ". Please use this code before it expires.<p>";
+
+
+
+
+                        Email emailComposed = EmailBuilder.startingBlank()
+                                .from(GlobalConstants.EMAIL_SENDER_NAME, GlobalConstants.EMAIL_ADDRESS_FOR_SENDER)
+                                .to("user",user.getEmail())
+                                .withSubject("E-mail Verification Code")
+                                .withHTMLText(htmlText)
+                                .buildEmail();
+
+                        getMailerInstance().sendMail(emailComposed,true);
+
 
 
                 }
@@ -239,12 +269,40 @@ public class ResetPasswordRESTEndpoint {
 
 
 
-                String message = "The e-mail verification code is : " + user_credentials.getPasswordResetCode() +
-                        "  | This verification code will expire at " + user_credentials.getResetCodeExpires().toLocaleString() + ". Please use this code before it expires.";
+
+//
+//                String message = "The e-mail verification code is : " + user_credentials.getPasswordResetCode() +
+//                        "  | This verification code will expire at " + user_credentials.getResetCodeExpires().toLocaleString() + ". Please use this code before it expires.";
+//
+//
+//
+//                Globals.sendEmail(user.getEmail(),user.getEmail(),"E-mail Verification Code",message);
 
 
 
-                Globals.sendEmail(user.getEmail(),user.getEmail(),"E-mail Verification Code",message);
+                String htmlText = "";
+
+
+
+                htmlText = "<p>You have made a request to verify your e-mail. If you did not request the e-mail verification please ignore this e-mail message.</p>"
+                        + "<h2>The e-mail verification code is : " + user_credentials.getPasswordResetCode() + "</h2>" +
+                        "<p>This verification code will expire at " +
+                        user_credentials.getResetCodeExpires().toLocalDateTime().getHour() + ":" + user_credentials.getResetCodeExpires().toLocalDateTime().getMinute()
+                        + ":"+ user_credentials.getResetCodeExpires().toLocalDateTime().getSecond()
+                        + ". Please use this code before it expires.<p>";
+
+
+
+
+                Email emailComposed = EmailBuilder.startingBlank()
+                        .from(GlobalConstants.EMAIL_SENDER_NAME, GlobalConstants.EMAIL_ADDRESS_FOR_SENDER)
+                        .to("user",user.getEmail())
+                        .withSubject("E-mail Verification Code")
+                        .withHTMLText(htmlText)
+                        .buildEmail();
+
+                getMailerInstance().sendMail(emailComposed,true);
+
 
 
 
