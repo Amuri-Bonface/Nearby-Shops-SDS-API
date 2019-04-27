@@ -27,8 +27,8 @@ public class FavouriteMarket {
             + " " + FavouriteMarket.END_USER_ID + " INT,"
             + " " + FavouriteMarket.ITEM_ID + " INT,"
 
-            + " FOREIGN KEY(" + FavouriteMarket.END_USER_ID +") REFERENCES " + User.TABLE_NAME + "(" + User.USER_ID + "),"
-            + " FOREIGN KEY(" + FavouriteMarket.ITEM_ID +") REFERENCES " + ServiceConfigurationGlobal.TABLE_NAME + "(" + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID + "),"
+            + " FOREIGN KEY(" + FavouriteMarket.END_USER_ID +") REFERENCES " + User.TABLE_NAME + "(" + User.USER_ID + ") ON DELETE CASCADE,"
+            + " FOREIGN KEY(" + FavouriteMarket.ITEM_ID +") REFERENCES " + ServiceConfigurationGlobal.TABLE_NAME + "(" + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID + ") ON DELETE CASCADE,"
             + " PRIMARY KEY (" + FavouriteMarket.END_USER_ID + ", " + FavouriteMarket.ITEM_ID + ")"
             + ")";
 

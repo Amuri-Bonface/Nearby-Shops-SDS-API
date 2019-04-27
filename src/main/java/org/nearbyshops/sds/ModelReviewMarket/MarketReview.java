@@ -41,8 +41,8 @@ public class MarketReview {
             + " " + MarketReview.REVIEW_TITLE + " text,"
             + " " + MarketReview.REVIEW_DATE + "  timestamp with time zone NOT NULL DEFAULT now(),"
 
-            + " FOREIGN KEY(" + MarketReview.ITEM_ID +") REFERENCES " + ServiceConfigurationGlobal.TABLE_NAME + "(" + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID + "),"
-            + " FOREIGN KEY(" + MarketReview.END_USER_ID +") REFERENCES " + User.TABLE_NAME + "(" + User.USER_ID + "),"
+            + " FOREIGN KEY(" + MarketReview.ITEM_ID +") REFERENCES " + ServiceConfigurationGlobal.TABLE_NAME + "(" + ServiceConfigurationGlobal.SERVICE_CONFIGURATION_ID + ") ON DELETE CASCADE,"
+            + " FOREIGN KEY(" + MarketReview.END_USER_ID +") REFERENCES " + User.TABLE_NAME + "(" + User.USER_ID + ") ON DELETE CASCADE,"
             + " UNIQUE (" + MarketReview.ITEM_ID + "," + MarketReview.END_USER_ID + ")"
             + ")";
 
